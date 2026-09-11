@@ -1,0 +1,33 @@
+name: Bug report
+about: Report a problem with My Tadiran for Homebridge
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the plugin. **Do not post OTP codes, refresh tokens, your full phone number, or other credentials.**
+  - type: input
+    id: model
+    attributes:
+      label: Tadiran AC model / family
+      description: If known. Do not include serial numbers.
+  - type: input
+    id: versions
+    attributes:
+      label: Homebridge / Node.js / plugin versions
+      placeholder: "Homebridge 2.4.0, Node 22.x, plugin 0.1.5"
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Redact phone numbers, device identifiers, tokens and any other personal data before posting.
+      render: shell
