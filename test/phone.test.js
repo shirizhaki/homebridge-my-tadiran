@@ -1,7 +1,5 @@
-'use strict';
-
-const assert = require('assert');
-const { normalizePhone, maskPhone } = require('../lib/phone');
+import assert from 'node:assert/strict';
+import { normalizePhone, maskPhone } from '../lib/phone.js';
 
 assert.strictEqual(normalizePhone('0501234567'), '+972501234567');
 assert.strictEqual(normalizePhone('501234567'), '+972501234567');

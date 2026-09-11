@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.5 — Debug logging and optional Fan Speed service
+
+- Added an opt-in **Enable debug logs** setting for command send, cloud acceptance, and cloud-state confirmation/reconciliation messages.
+- Added an opt-in separate HomeKit `Fanv2` service with a speed slider for Low / Medium / Auto / High.
+- The optional Fan Speed service mirrors AC power and is removed from the cached accessory again when disabled.
+- Command failures now produce a concise normal error log even when debug logging is off.
+- Debug output intentionally avoids authentication tokens, OTP codes, and full phone numbers.
+- Fixed the optimistic-state timeout so it expires after the documented three disagreeing polling cycles.
+- Retained the native ESM / Homebridge 2 compatibility work validated in 0.1.4.
+
+## 0.1.4 — Homebridge 2 / verification readiness
+
+- Migrated the runtime to native ESM, matching current Homebridge plugin guidance.
+- Declared the currently supported Node.js 22/24 runtime range used by Homebridge 2.x.
+- Added GitHub Actions CI on Node.js 22 and 24.
+- Kept authentication state in Homebridge persistent storage; upgrading does not require a new SMS login under normal conditions.
+- No user-facing configuration changes from 0.1.3.
+
 All notable changes to this project will be documented here.
 
 ## 0.1.3 - 2026-09-11

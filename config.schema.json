@@ -44,6 +44,18 @@
         "type": "boolean",
         "default": false,
         "description": "Adds a separate HomeKit switch for FAN-only mode. Off by default to keep the Home app clean."
+      },
+      "exposeFanSpeedControl": {
+        "title": "Expose separate Fan Speed control",
+        "type": "boolean",
+        "default": false,
+        "description": "Adds a separate HomeKit Fan service with a speed slider for Low / Medium / Auto / High. Its power button mirrors the AC power. The normal Heater/Cooler fan-speed control remains available where Apple Home shows it."
+      },
+      "debugLogs": {
+        "title": "Enable debug logs",
+        "type": "boolean",
+        "default": false,
+        "description": "Logs My Tadiran command send/acknowledgement and cloud confirmation details for troubleshooting. Authentication tokens, OTP codes, and full phone numbers are never intentionally logged."
       }
     },
     "required": [

@@ -1,7 +1,7 @@
 {
   "name": "homebridge-my-tadiran",
   "displayName": "My Tadiran",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "Unofficial Homebridge plugin for Tadiran air conditioners paired with the My Tadiran app, with direct cloud control and HomeKit support.",
   "author": "shirizhaki",
   "license": "MIT",
@@ -14,7 +14,7 @@
     "url": "https://github.com/shirizhaki/homebridge-my-tadiran/issues"
   },
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "keywords": [
     "homebridge-plugin",
     "supports-hap",
@@ -29,7 +29,7 @@
     "israel"
   ],
   "engines": {
-    "node": ">=18.20.4",
+    "node": "^22.10.0 || ^24.0.0",
     "homebridge": "^1.8.0 || ^2.0.0"
   },
   "files": [
@@ -44,7 +44,7 @@
   ],
   "dependencies": {},
   "scripts": {
-    "test": "node --check index.js && node --check lib/api.js && node --check lib/platform.js && node --check lib/accessory.js && node --check lib/phone.js && node test/phone.test.js",
+    "test": "node --check index.js && node --check lib/api.js && node --check lib/platform.js && node --check lib/accessory.js && node --check lib/phone.js && node --check lib/constants.js && node test/phone.test.js && node test/accessory.test.js",
     "prepublishOnly": "npm test",
     "pack:check": "npm pack --dry-run"
   },

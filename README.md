@@ -24,6 +24,8 @@ It connects directly to Tadiran's cloud API and exposes each AC as a native Appl
 - Current room temperature
 - Fan speed: Low / Medium / Auto / High
 - Optional Dry Mode and Fan Only switches, **hidden by default**
+- Optional separate Fan Speed HomeKit service, **hidden by default**
+- Optional plugin-specific debug logging for command troubleshooting
 - SMS verification for first-time login
 - Persistent Cognito refresh token, so plugin updates normally **do not require another SMS**
 - Configurable cloud polling, 30 seconds by default
@@ -47,7 +49,7 @@ The plugin settings are designed so you do not need to know how Tadiran's API wo
 
 If the plugin runs as a **child bridge**, pair that child bridge with Apple Home using its Homebridge QR code.
 
-## Optional Dry and Fan-only controls
+## Optional HomeKit controls
 
 Apple's standard HomeKit `HeaterCooler` service provides Auto, Heat, and Cool target modes, but no native Dry or Fan-only target state.
 
@@ -58,6 +60,8 @@ To keep Apple Home clean, both extra modes are hidden by default. If you want th
 
 Each enabled mode appears as a separate HomeKit switch on the AC accessory. If you disable the option again, the plugin removes the cached switch service after the next Homebridge restart.
 
+You can also enable **Expose separate Fan Speed control**. This adds a HomeKit `Fanv2` service with a speed slider mapped as Low 25%, Medium 50%, Auto 75%, and High 100%. Its power button mirrors the AC power. The normal fan-speed characteristic on the Heater/Cooler service remains in place, so this option is only for people who want easier access to fan speed as a separate Home tile/service.
+
 ## What is intentionally not exposed
 
 ### Swing
@@ -67,7 +71,7 @@ Swing is currently not exposed. The upstream Home Assistant work documents `swin
 ## Requirements
 
 - Homebridge 1.8+ or Homebridge 2.x
-- Node.js 18.20.4 or newer (Homebridge 2.x itself currently requires a supported Node.js 22/24 release)
+- Node.js 22 or 24
 - An active My Tadiran account
 - At least one AC already paired with the **My Tadiran** app
 - Internet access from Homebridge; this integration is currently cloud-only
@@ -117,7 +121,9 @@ Normally you should use the Homebridge UI rather than editing JSON manually.
   "phone": "+972501234567",
   "pollInterval": 30,
   "exposeDryMode": false,
-  "exposeFanOnly": false
+  "exposeFanOnly": false,
+  "exposeFanSpeedControl": false,
+  "debugLogs": false
 }
 ```
 
@@ -145,6 +151,7 @@ During the initial SMS verification only:
 | High fan | Rotation Speed 100% |
 | Dry | Optional separate switch |
 | Fan only | Optional separate switch |
+| Fan speed service | Optional separate `Fanv2` service |
 
 Tadiran does not accept target-temperature changes while the AC is in Auto mode. The official My Tadiran app similarly hides that control in Auto.
 
@@ -155,6 +162,18 @@ Tadiran's cloud shadow can report stale values for a while after a command. The 
 To prevent Apple Home from immediately snapping back to stale data, the plugin keeps a newly commanded value optimistically for up to three polling cycles. With the default 30-second interval, that is roughly 90 seconds. If the cloud still disagrees after that, the plugin returns to the cloud-reported state.
 
 Rapid HomeKit updates are batched into one cloud request where possible.
+
+## Debug logging
+
+Enable **Enable debug logs** in the Homebridge plugin settings when troubleshooting commands. The option is off by default. When enabled, the plugin logs a concise command lifecycle, for example:
+
+```text
+[My Tadiran] [debug] Kitchen: sending command (temp_set=25)
+[My Tadiran] [debug] Kitchen: cloud accepted command (temp_set=25)
+[My Tadiran] [debug] Kitchen: cloud confirmed temp_set=25
+```
+
+If the Tadiran cloud does not confirm the desired value within the optimistic-state window, the debug log also notes that the plugin is returning to the cloud-reported value. Authentication tokens, OTP codes, and full phone numbers are never intentionally included in debug output.
 
 ## Authentication, updates, and local storage
 
