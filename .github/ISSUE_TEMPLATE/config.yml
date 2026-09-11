@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Upstream Home Assistant integration
+    url: https://github.com/rluvaton/ha-my-tadiran
+    about: Foundational My Tadiran API research and the Home Assistant implementation by Raz Luvaton.
