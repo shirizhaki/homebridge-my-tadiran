@@ -1,0 +1,53 @@
+{
+  "pluginAlias": "MyTadiran",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "### My Tadiran setup\n1. Enter the phone number registered with **My Tadiran**. For Israeli accounts, `+972` is pre-filled — just add the rest of the number. You may also paste `050...` or the full `+972...` number; the plugin normalizes it automatically.\n2. **Save and restart Homebridge.** An SMS code will be sent.\n3. Enter the SMS code below, then **save and restart again**.\n4. Done — the login refresh token is kept in Homebridge's persistent storage, so updates normally do not require another SMS.",
+  "footerDisplay": "Unofficial cloud integration. Not affiliated with Tadiran. This plugin is built on the foundational API research and Home Assistant integration work of **Raz Luvaton (@rluvaton)** — see the README and THIRD_PARTY_NOTICES for full credit.",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "My Tadiran"
+      },
+      "phone": {
+        "title": "My Tadiran phone number",
+        "type": "string",
+        "default": "+972",
+        "placeholder": "+972501234567",
+        "description": "For Israel, keep +972 and add the rest of the mobile number (for example +972501234567). You can also paste 0501234567 and the plugin will convert it automatically."
+      },
+      "otp": {
+        "title": "SMS verification code",
+        "type": "string",
+        "placeholder": "Enter after the first restart",
+        "description": "Needed only for the first login or if Tadiran revokes the saved login. After successful verification you may clear this field."
+      },
+      "pollInterval": {
+        "title": "Polling interval (seconds)",
+        "type": "integer",
+        "default": 30,
+        "minimum": 15,
+        "maximum": 300,
+        "description": "How often Homebridge checks the Tadiran cloud for updated AC state."
+      },
+      "exposeDryMode": {
+        "title": "Expose Dry Mode switch",
+        "type": "boolean",
+        "default": false,
+        "description": "Adds a separate HomeKit switch for DRY mode. Off by default to keep the Home app clean."
+      },
+      "exposeFanOnly": {
+        "title": "Expose Fan Only switch",
+        "type": "boolean",
+        "default": false,
+        "description": "Adds a separate HomeKit switch for FAN-only mode. Off by default to keep the Home app clean."
+      }
+    },
+    "required": [
+      "phone"
+    ]
+  }
+}
