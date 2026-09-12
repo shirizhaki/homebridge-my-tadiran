@@ -1,0 +1,74 @@
+<div class="mb-3">
+  <div class="alert alert-info mb-3">
+    Configure your My Tadiran account below. First-time login uses an SMS verification code.
+  </div>
+</div>
+
+<div class="card border-danger mt-4 mb-3">
+  <div class="card-body">
+    <h5 class="card-title">Factory reset</h5>
+    <p class="card-text mb-3">
+      Clears the saved Tadiran login and resets this plugin's settings, including the phone number and SMS code.
+      Your Homebridge child-bridge pairing is kept.
+    </p>
+    <button id="factory-reset" type="button" class="btn btn-danger">Reset My Tadiran plugin</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  const button = document.getElementById('factory-reset');
+
+  homebridge.addEventListener('ready', () => {
+    homebridge.showSchemaForm();
+  });
+
+  button.addEventListener('click', async () => {
+    const confirmed = window.confirm(
+      'Reset My Tadiran?\n\nThis will clear the saved Tadiran login, phone number, OTP, and plugin options. You will need to restart Homebridge and link the Tadiran account again.'
+    );
+    if (!confirmed) return;
+
+    homebridge.showSpinner();
+    button.disabled = true;
+
+    try {
+      // Write a persistent reset marker and remove saved authentication first.
+      // The marker prevents a still-running child bridge from restoring the
+      // refresh token before the user restarts Homebridge.
+      await homebridge.request('/factory-reset');
+
+      const blocks = await homebridge.getPluginConfig();
+      const current = blocks[0] || {};
+      const resetConfig = {
+        platform: current.platform || 'MyTadiran',
+        name: 'My Tadiran',
+        phone: '+972',
+        pollInterval: 30,
+        exposeDryMode: false,
+        exposeFanOnly: false,
+        exposeFanSpeedControl: false,
+        debugLogs: false,
+      };
+
+      // Child-bridge identity/pairing belongs to Homebridge rather than the
+      // Tadiran account. Preserve it so a factory reset does not force the
+      // user to pair the child bridge with Apple Home again.
+      if (current._bridge) resetConfig._bridge = current._bridge;
+
+      await homebridge.updatePluginConfig([resetConfig]);
+      await homebridge.savePluginConfig();
+      homebridge.toast.success(
+        'My Tadiran was reset. Restart Homebridge, then enter your phone number to link the account again.',
+        'Factory reset complete'
+      );
+      homebridge.closeSettings();
+    } catch (error) {
+      homebridge.toast.error(error?.message || 'Factory reset failed.', 'My Tadiran');
+      button.disabled = false;
+    } finally {
+      homebridge.hideSpinner();
+    }
+  });
+})();
+</script>

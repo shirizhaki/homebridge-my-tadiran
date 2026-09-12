@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.6 — Recover invalid Cognito OTP sessions
+
+- Treat AWS Cognito `NotAuthorizedException: Invalid session for the user` during SMS verification as a recoverable expired login session.
+- Automatically request and persist a fresh SMS challenge when Cognito invalidates the previous OTP session, instead of leaving Homebridge stuck on the stale session.
+- Keep ordinary wrong/expired OTP handling unchanged.
+- Add regression tests for Cognito error classification and invalid-session recovery.
+- Add a one-click **Factory reset** action in the Homebridge settings UI. It clears the saved Tadiran authentication state and resets the plugin configuration, including phone number and OTP, without SSH.
+- Preserve the Homebridge child-bridge identity during factory reset so users do not have to pair the child bridge with Apple Home again.
+- Add a persistent reset marker so a still-running child bridge cannot recreate the deleted refresh-token file before Homebridge is restarted.
+
 ## 0.1.5 — Debug logging and optional Fan Speed service
 
 - Added an opt-in **Enable debug logs** setting for command send, cloud acceptance, and cloud-state confirmation/reconciliation messages.

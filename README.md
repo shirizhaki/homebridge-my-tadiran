@@ -28,6 +28,7 @@ It connects directly to Tadiran's cloud API and exposes each AC as a native Appl
 - Optional plugin-specific debug logging for command troubleshooting
 - SMS verification for first-time login
 - Persistent Cognito refresh token, so plugin updates normally **do not require another SMS**
+- One-click **Factory reset** button in the Homebridge settings UI for clearing the saved Tadiran login and plugin configuration without SSH
 - Configurable cloud polling, 30 seconds by default
 - Optimistic state handling for Tadiran cloud-shadow lag
 - Command batching for rapid HomeKit changes
@@ -46,6 +47,8 @@ The plugin settings are designed so you do not need to know how Tadiran's API wo
 5. **Save and restart again.**
 6. The plugin saves a refresh token in Homebridge's persistent storage and discovers your AC units automatically.
 7. After login succeeds, the SMS code field may be cleared.
+
+If you ever want to start over, use **Factory reset → Reset My Tadiran plugin** in the plugin settings. It clears the saved Tadiran login, phone number, OTP, and My Tadiran plugin options, while preserving the Homebridge child-bridge identity so you do not have to pair the child bridge with Apple Home again. Restart Homebridge after the reset, then enter the phone number and complete the normal SMS verification flow.
 
 If the plugin runs as a **child bridge**, pair that child bridge with Apple Home using its Homebridge QR code.
 
@@ -191,6 +194,8 @@ The plugin does not intentionally log authentication tokens. Phone numbers are m
 
 If Cognito invalidates the saved refresh token, the plugin falls back to the SMS verification flow again.
 
+To completely unlink the account and start over, open the plugin settings and press **Reset My Tadiran plugin** in the **Factory reset** section. The reset clears the plugin's saved Tadiran authentication file and restores its configuration to defaults, including the phone number (`+972` placeholder) and an empty OTP. The Homebridge child-bridge identity is deliberately preserved, so resetting the Tadiran account does not require pairing the child bridge with Apple Home again. Restart Homebridge after the reset before linking the account again.
+
 ## Compatibility
 
 The plugin has been validated against a real My Tadiran account with Homebridge 2.4.0 for authentication, device discovery, HomeKit exposure, and control. Broader testing across Tadiran model families is still needed.
@@ -221,6 +226,8 @@ Complete the SMS verification step and restart Homebridge once more. Make sure t
 ### Invalid or expired SMS code
 
 Clear the code field and request a new login code. SMS codes are short-lived.
+
+If Tadiran/Cognito reports `Invalid session for the user` while the SMS code is being verified, the plugin treats that as a stale OTP session, requests a fresh SMS challenge automatically, and asks you to enter the newly sent code. No manual deletion of Homebridge persistence files is required.
 
 ### Apple Home shows an old value after a change
 
