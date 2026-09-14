@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.1.7 — Reliability and refreshed settings
+
+- Replace the mixed custom/schema screen with one responsive settings UI: accessible toggle switches, light/dark styling, grouped account/HomeKit/preferences sections, and concise labels. Do not expose the plugin name as an editable field.
+- Place **Reset connection** at the bottom of the account section. Clear authentication details while preserving optional controls, polling, logging, other preferences and child-bridge pairing.
+- Keep the native Homebridge Save workflow. Edits preserve child-bridge metadata, unknown options, and additional configuration blocks.
+- Clear used OTPs from active configuration when settings are reopened and local saved-login state matches the configured phone. Keep pending codes and fail conservatively on unreadable status. No cloud calls or token disclosure are added.
+- Validate form input, serialize rapid edits, and prevent saving stale values while updates are pending or have failed. Explain partial reset failures and allow retrying them.
+- Add a 15-second timeout to Cognito and My Tadiran cloud requests so a stalled connection cannot leave polling or a HomeKit command pending indefinitely.
+- Preserve the saved refresh token when Cognito returns a transient service, rate-limit, or network error; only an explicit authorization failure now starts a new SMS login.
+- Retry transient saved-token startup failures automatically after 30 seconds, with exponential backoff capped at 300 seconds. Never automatically retry the SMS/OTP setup steps after network failures.
+- Cancel startup retries on shutdown and avoid writing authentication state while a factory reset is pending.
+- Catch reset/poll filesystem failures inside the plugin instead of allowing an unhandled exception.
+- Bound repeated Cognito custom-auth challenges to five requests instead of allowing an unexpected response sequence to loop indefinitely.
+- Validate and clamp the polling interval to 15–300 seconds, falling back to 30 seconds for malformed manual configuration values.
+- Use `npm ci` in GitHub Actions for deterministic dependency installation.
+- Add regression coverage for transient authentication failures, request timeout signals, Cognito challenge limits, and polling interval validation.
+- Exercise the full invalid-session-to-fresh-SMS login recovery, stalled response bodies, HomeKit control mappings and failed-command rollback. Test UI field mappings, validation, update/reset races, config preservation, and the real UI server over IPC.
+- Add tests for stale-code cleanup, pending and mismatched accounts, unreadable status, and connection-only reset preservation.
+
 ## 0.1.6 — Recover invalid Cognito OTP sessions
 
 - Treat AWS Cognito `NotAuthorizedException: Invalid session for the user` during SMS verification as a recoverable expired login session.

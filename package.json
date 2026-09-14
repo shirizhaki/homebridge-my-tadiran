@@ -1,7 +1,7 @@
 {
   "name": "homebridge-my-tadiran",
   "displayName": "My Tadiran",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Unofficial Homebridge plugin for Tadiran air conditioners paired with the My Tadiran app, with direct cloud control and HomeKit support.",
   "author": "shirizhaki",
   "license": "MIT",
@@ -47,7 +47,7 @@
     "@homebridge/plugin-ui-utils": "^2.2.6"
   },
   "scripts": {
-    "test": "node --check index.js && node --check lib/api.js && node --check lib/platform.js && node --check lib/accessory.js && node --check lib/phone.js && node --check lib/constants.js && node --check lib/auth-storage.js && node --check homebridge-ui/server.js && node test/phone.test.js && node test/api.test.js && node test/auth.test.js && node test/factory-reset.test.js && node test/accessory.test.js",
+    "test": "node --check index.js && node --check lib/api.js && node --check lib/platform.js && node --check lib/accessory.js && node --check lib/phone.js && node --check lib/constants.js && node --check lib/auth-storage.js && node --check homebridge-ui/server.js && node --check homebridge-ui/public/settings.js && node test/phone.test.js && node test/api.test.js && node test/auth.test.js && node test/reliability.test.js && node test/recovery.test.js && node test/network.test.js && node test/factory-reset.test.js && node test/accessory.test.js && node test/ui.test.js",
     "prepublishOnly": "npm test",
     "pack:check": "npm pack --dry-run"
   },

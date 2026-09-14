@@ -7,11 +7,6 @@
   "schema": {
     "type": "object",
     "properties": {
-      "name": {
-        "title": "Name",
-        "type": "string",
-        "default": "My Tadiran"
-      },
       "phone": {
         "title": "My Tadiran phone number",
         "type": "string",
@@ -23,7 +18,7 @@
         "title": "SMS verification code",
         "type": "string",
         "placeholder": "Enter after the first restart",
-        "description": "Needed only for the first login or if Tadiran revokes the saved login. After successful verification you may clear this field."
+        "description": "Only needed when linking your account. A used code is removed when you reopen settings after a saved login is available."
       },
       "pollInterval": {
         "title": "Polling interval (seconds)",
@@ -57,10 +52,7 @@
         "default": false,
         "description": "Logs My Tadiran command send/acknowledgement and cloud confirmation details for troubleshooting. Authentication tokens, OTP codes, and full phone numbers are never intentionally logged."
       }
-    },
-    "required": [
-      "phone"
-    ]
+    }
   },
   "customUi": true
 }

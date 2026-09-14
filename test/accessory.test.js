@@ -139,4 +139,37 @@ handler.configureFanSpeedService(false);
 assert.equal(accessory.services.some(service => service.subtype === 'fan-speed'), false);
 assert.deepEqual(errors, []);
 
-console.log('accessory optional fan/debug tests passed');
+// Keep the existing HomeKit controls and command payloads compatible.
+await handler.service.getCharacteristic(Characteristic.Active).setter(Active.INACTIVE);
+assert.deepEqual(calls.at(-1).payload, { power: false });
+await handler.service.getCharacteristic(Characteristic.TargetHeaterCoolerState).setter(TargetHeaterCoolerState.HEAT);
+assert.deepEqual(calls.at(-1).payload, { power: true, mode: 'HEAT' });
+await handler.setTemperature(26);
+assert.deepEqual(calls.at(-1).payload, { temp_set: 26 });
+for (const [percent, wind] of [[25, 'LOW'], [50, 'MEDIUM'], [75, 'AUTO'], [100, 'HIGH']]) {
+  await handler.setFanPercent(percent);
+  assert.deepEqual(calls.at(-1).payload, { wind_speed: wind });
+}
+await handler.service.getCharacteristic(Characteristic.TargetHeaterCoolerState).setter(TargetHeaterCoolerState.AUTO);
+await assert.rejects(() => handler.setTemperature(24), /AUTO/);
+for (const [subtype, mode] of [['dry-mode', 'DRY'], ['fan-only', 'FAN']]) {
+  const service = handler.configureModeSwitch(subtype, mode, true, mode);
+  await service.getCharacteristic(Characteristic.On).setter(true);
+  assert.deepEqual(calls.at(-1).payload, { power: true, mode });
+  await service.getCharacteristic(Characteristic.On).setter(false);
+  assert.deepEqual(calls.at(-1).payload, { power: false });
+  handler.configureModeSwitch(subtype, mode, false, mode);
+  assert.ok(!accessory.services.some(item => item.subtype === subtype));
+}
+const before = calls.length;
+await Promise.all([handler.send({ power: true }), handler.send({ mode: 'COOL' })]);
+assert.equal(calls.length, before + 1);
+assert.deepEqual(calls.at(-1).payload, { power: true, mode: 'COOL' });
+for (let poll = 0; poll < 3; poll++) handler.updateFromCloud(device);
+assert.equal(handler.pending.size, 0);
+platform.client.updateDeviceShadow = async () => { throw new DOMException('Timed out', 'TimeoutError'); };
+await assert.rejects(() => handler.send({ temp_set: 27 }), { name: 'TimeoutError' });
+assert.equal(handler.pending.size, 0);
+assert.equal(handler.batchTimer, null);
+assert.equal(handler.config.temp_set, 23);
+console.log('HomeKit power/modes/temperature/fan/batching and failure rollback tests passed');

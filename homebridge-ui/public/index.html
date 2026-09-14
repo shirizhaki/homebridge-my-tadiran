@@ -1,74 +1,94 @@
-<div class="mb-3">
-  <div class="alert alert-info mb-3">
-    Configure your My Tadiran account below. First-time login uses an SMS verification code.
-  </div>
-</div>
+<link rel="stylesheet" href="settings.css?v=0.1.7-ui3">
 
-<div class="card border-danger mt-4 mb-3">
-  <div class="card-body">
-    <h5 class="card-title">Factory reset</h5>
-    <p class="card-text mb-3">
-      Clears the saved Tadiran login and resets this plugin's settings, including the phone number and SMS code.
-      Your Homebridge child-bridge pairing is kept.
-    </p>
-    <button id="factory-reset" type="button" class="btn btn-danger">Reset My Tadiran plugin</button>
-  </div>
-</div>
+<main id="tadiran-settings" class="td-settings" lang="en" dir="ltr">
+  <header class="td-header">
+    <div class="td-brand-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4v24M5.6 10l20.8 12M5.6 22l20.8-12M12 6l4 4 4-4M12 26l4-4 4 4M5.3 14.5l5.5-1.5-1.5-5.5M26.7 17.5l-5.5 1.5 1.5 5.5M9.3 24.5l1.5-5.5-5.5-1.5M22.7 7.5l-1.5 5.5 5.5 1.5"/>
+      </svg>
+    </div>
+    <div class="td-brand-copy">
+      <h1>My Tadiran <span id="plugin-version" class="td-version" hidden></span></h1>
+    </div>
+  </header>
 
-<script>
-(() => {
-  const button = document.getElementById('factory-reset');
+  <p id="load-error" class="td-message td-error" role="alert" hidden>Settings could not be loaded. Close this window and reopen it to try again. Nothing was reset.</p>
 
-  homebridge.addEventListener('ready', () => {
-    homebridge.showSchemaForm();
-  });
+  <form id="settings-form" novalidate>
+    <fieldset id="settings-fields" disabled>
+      <section class="td-card" aria-labelledby="account-heading">
+        <div class="td-section-heading">
+          <h2 id="account-heading">Tadiran account</h2>
+        </div>
+        <div class="td-grid">
+          <div class="td-field">
+            <label for="phone">Phone number</label>
+            <input class="form-control td-input" id="phone" name="phone" type="tel" dir="ltr" autocomplete="tel" placeholder="+972501234567" required aria-describedby="phone-help phone-error">
+            <p id="phone-help" class="td-help">Israeli numbers can start with +972 or 050…</p>
+            <p id="phone-error" class="td-field-error" hidden>Enter the phone number registered with My Tadiran.</p>
+          </div>
+          <div class="td-field">
+            <label for="otp">SMS verification code <span class="td-label-note">Setup only</span></label>
+            <input class="form-control td-input" id="otp" name="otp" type="text" dir="ltr" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter your SMS code" aria-describedby="otp-help">
+            <p id="otp-help" class="td-help">Only needed when linking your account.</p>
+          </div>
+        </div>
+        <details id="setup-guide" class="td-details">
+          <summary>How to connect</summary>
+          <ol class="td-setup-steps">
+            <li>Enter your phone number. <strong>Save and restart Homebridge</strong> to receive an SMS code.</li>
+            <li>Enter that code above, then <strong>save and restart once more</strong> to connect.</li>
+          </ol>
+          <p class="td-help">Once connected, restarts and updates normally do not need another SMS code.</p>
+        </details>
+        <section class="td-reset" aria-labelledby="reset-heading">
+          <div><h2 id="reset-heading">Reset connection</h2><p>Clear your saved Tadiran login, phone number and SMS code. Plugin preferences and Apple Home pairing are kept.</p></div>
+          <button id="factory-reset" type="button" class="td-reset-button" disabled>Reset connection</button>
+          <p id="reset-error" class="td-field-error" role="alert" hidden></p>
+        </section>
+      </section>
 
-  button.addEventListener('click', async () => {
-    const confirmed = window.confirm(
-      'Reset My Tadiran?\n\nThis will clear the saved Tadiran login, phone number, OTP, and plugin options. You will need to restart Homebridge and link the Tadiran account again.'
-    );
-    if (!confirmed) return;
+      <section class="td-card" aria-labelledby="controls-heading">
+        <div class="td-section-heading">
+          <h2 id="controls-heading">Optional controls</h2>
+        </div>
+        <label class="td-toggle-row" for="exposeDryMode">
+          <span class="td-toggle-copy"><span class="td-toggle-title" id="dry-title">Dry mode</span><span class="td-help" id="dry-help">Add a separate switch for dehumidifying.</span></span>
+          <span class="td-toggle"><input id="exposeDryMode" name="exposeDryMode" type="checkbox" role="switch" aria-labelledby="dry-title" aria-describedby="dry-help"><span class="td-toggle-track" aria-hidden="true"></span></span>
+        </label>
+        <label class="td-toggle-row" for="exposeFanOnly">
+          <span class="td-toggle-copy"><span class="td-toggle-title" id="fan-title">Fan only</span><span class="td-help" id="fan-help">Add a separate switch for air circulation without cooling.</span></span>
+          <span class="td-toggle"><input id="exposeFanOnly" name="exposeFanOnly" type="checkbox" role="switch" aria-labelledby="fan-title" aria-describedby="fan-help"><span class="td-toggle-track" aria-hidden="true"></span></span>
+        </label>
+        <label class="td-toggle-row" for="exposeFanSpeedControl">
+          <span class="td-toggle-copy"><span class="td-toggle-title" id="speed-title">Fan speed control</span><span class="td-help" id="speed-help">Add a separate Low / Medium / Auto / High slider. Its power button also controls the AC.</span></span>
+          <span class="td-toggle"><input id="exposeFanSpeedControl" name="exposeFanSpeedControl" type="checkbox" role="switch" aria-labelledby="speed-title" aria-describedby="speed-help"><span class="td-toggle-track" aria-hidden="true"></span></span>
+        </label>
+        <p class="td-section-note">The standard heating, cooling and fan-speed controls are unchanged. Restart Homebridge after changing these options.</p>
+      </section>
 
-    homebridge.showSpinner();
-    button.disabled = true;
+      <section class="td-card" aria-labelledby="preferences-heading">
+        <div class="td-section-heading">
+          <h2 id="preferences-heading">Preferences</h2>
+        </div>
+        <div class="td-grid">
+          <div class="td-field">
+            <label for="pollInterval">Cloud refresh interval <span class="td-label-note">Seconds</span></label>
+            <input class="form-control td-input" id="pollInterval" name="pollInterval" type="number" min="15" max="300" step="1" required inputmode="numeric" aria-describedby="poll-help poll-error">
+            <p id="poll-help" class="td-help">15–300 seconds. Recommended: 30.</p>
+            <p id="poll-error" class="td-field-error" hidden>Use a whole number from 15 to 300.</p>
+          </div>
+        </div>
+        <label class="td-toggle-row td-debug-row" for="debugLogs">
+          <span class="td-toggle-copy"><span class="td-toggle-title" id="debug-title">Debug logging</span><span class="td-help" id="debug-help">Include command and cloud-confirmation details in Homebridge logs. Leave off unless troubleshooting.</span></span>
+          <span class="td-toggle"><input id="debugLogs" name="debugLogs" type="checkbox" role="switch" aria-labelledby="debug-title" aria-describedby="debug-help"><span class="td-toggle-track" aria-hidden="true"></span></span>
+        </label>
+      </section>
+    </fieldset>
+  </form>
 
-    try {
-      // Write a persistent reset marker and remove saved authentication first.
-      // The marker prevents a still-running child bridge from restoring the
-      // refresh token before the user restarts Homebridge.
-      await homebridge.request('/factory-reset');
+  <div class="td-save-hint"><span class="td-hint-dot" aria-hidden="true"></span><p id="save-status" role="status" aria-live="polite">Loading your settings…</p><button id="retry-update" type="button" class="td-text-button" hidden>Retry</button></div>
 
-      const blocks = await homebridge.getPluginConfig();
-      const current = blocks[0] || {};
-      const resetConfig = {
-        platform: current.platform || 'MyTadiran',
-        name: 'My Tadiran',
-        phone: '+972',
-        pollInterval: 30,
-        exposeDryMode: false,
-        exposeFanOnly: false,
-        exposeFanSpeedControl: false,
-        debugLogs: false,
-      };
-
-      // Child-bridge identity/pairing belongs to Homebridge rather than the
-      // Tadiran account. Preserve it so a factory reset does not force the
-      // user to pair the child bridge with Apple Home again.
-      if (current._bridge) resetConfig._bridge = current._bridge;
-
-      await homebridge.updatePluginConfig([resetConfig]);
-      await homebridge.savePluginConfig();
-      homebridge.toast.success(
-        'My Tadiran was reset. Restart Homebridge, then enter your phone number to link the account again.',
-        'Factory reset complete'
-      );
-      homebridge.closeSettings();
-    } catch (error) {
-      homebridge.toast.error(error?.message || 'Factory reset failed.', 'My Tadiran');
-      button.disabled = false;
-    } finally {
-      homebridge.hideSpinner();
-    }
-  });
-})();
-</script>
+  <footer class="td-footer">Unofficial integration · Not affiliated with Tadiran<br>Built by Shir Izhaki, based on the API research of <a href="https://github.com/rluvaton/ha-my-tadiran" target="_blank" rel="noopener noreferrer">Raz Luvaton</a>.</footer>
+</main>
+<script src="settings.js?v=0.1.7-ui3"></script>

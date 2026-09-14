@@ -26,10 +26,12 @@ It connects directly to Tadiran's cloud API and exposes each AC as a native Appl
 - Optional Dry Mode and Fan Only switches, **hidden by default**
 - Optional separate Fan Speed HomeKit service, **hidden by default**
 - Optional plugin-specific debug logging for command troubleshooting
+- Responsive settings UI with accessible toggle switches, light/dark styling, and connection reset in the account section
 - SMS verification for first-time login
 - Persistent Cognito refresh token, so plugin updates normally **do not require another SMS**
-- One-click **Factory reset** button in the Homebridge settings UI for clearing the saved Tadiran login and plugin configuration without SSH
+- **Reset connection** button for clearing Tadiran login details while keeping plugin preferences and Homebridge pairing
 - Configurable cloud polling, 30 seconds by default
+- Bounded cloud requests, with a 15-second timeout for stalled connections
 - Optimistic state handling for Tadiran cloud-shadow lag
 - Command batching for rapid HomeKit changes
 - Homebridge child-bridge compatible
@@ -46,9 +48,9 @@ The plugin settings are designed so you do not need to know how Tadiran's API wo
 4. Enter the code in **SMS verification code**.
 5. **Save and restart again.**
 6. The plugin saves a refresh token in Homebridge's persistent storage and discovers your AC units automatically.
-7. After login succeeds, the SMS code field may be cleared.
+7. After login succeeds, the used SMS code is automatically removed from active configuration the next time you open the settings. The UI checks local saved-login state for the same phone number; pending or unconfirmed codes are left alone.
 
-If you ever want to start over, use **Factory reset → Reset My Tadiran plugin** in the plugin settings. It clears the saved Tadiran login, phone number, OTP, and My Tadiran plugin options, while preserving the Homebridge child-bridge identity so you do not have to pair the child bridge with Apple Home again. Restart Homebridge after the reset, then enter the phone number and complete the normal SMS verification flow.
+To link the account again, use **Reset connection** at the bottom of **Tadiran account**. It clears the saved login and removes phone number, OTP and legacy authentication fields from active plugin configuration. Polling, optional controls, debug logging, other preferences and Homebridge child-bridge pairing are preserved. Restart Homebridge after the reset, then enter your phone number and complete the SMS verification flow.
 
 If the plugin runs as a **child bridge**, pair that child bridge with Apple Home using its Homebridge QR code.
 
@@ -58,12 +60,12 @@ Apple's standard HomeKit `HeaterCooler` service provides Auto, Heat, and Cool ta
 
 To keep Apple Home clean, both extra modes are hidden by default. If you want them, enable either option in the Homebridge plugin settings:
 
-- **Expose Dry Mode switch**
-- **Expose Fan Only switch**
+- **Dry mode**
+- **Fan only**
 
 Each enabled mode appears as a separate HomeKit switch on the AC accessory. If you disable the option again, the plugin removes the cached switch service after the next Homebridge restart.
 
-You can also enable **Expose separate Fan Speed control**. This adds a HomeKit `Fanv2` service with a speed slider mapped as Low 25%, Medium 50%, Auto 75%, and High 100%. Its power button mirrors the AC power. The normal fan-speed characteristic on the Heater/Cooler service remains in place, so this option is only for people who want easier access to fan speed as a separate Home tile/service.
+You can also enable **Fan speed control**. This adds a HomeKit `Fanv2` service with a speed slider mapped as Low 25%, Medium 50%, Auto 75%, and High 100%. Its power button mirrors the AC power. The normal fan-speed characteristic on the Heater/Cooler service remains in place, so this option is only for people who want easier access to fan speed as a separate Home tile/service.
 
 ## What is intentionally not exposed
 
@@ -168,7 +170,7 @@ Rapid HomeKit updates are batched into one cloud request where possible.
 
 ## Debug logging
 
-Enable **Enable debug logs** in the Homebridge plugin settings when troubleshooting commands. The option is off by default. When enabled, the plugin logs a concise command lifecycle, for example:
+Enable **Debug logging** in the Homebridge plugin settings when troubleshooting commands. The option is off by default. When enabled, the plugin logs a concise command lifecycle, for example:
 
 ```text
 [My Tadiran] [debug] Kitchen: sending command (temp_set=25)
@@ -190,11 +192,17 @@ my-tadiran-auth.json
 
 The file is written with mode `0600` where supported. It is **not stored inside the plugin package or `node_modules`**, so updating or reinstalling the plugin normally does not remove the login. Docker users should make sure the Homebridge data directory itself is on a persistent volume.
 
-The plugin does not intentionally log authentication tokens. Phone numbers are masked in normal plugin logs.
+The plugin does not intentionally log authentication tokens. Phone numbers are masked in normal plugin logs. Once a saved refresh token is available for the configured phone, reopening the settings removes the old OTP from active configuration using Homebridge's configuration API. This also cleans up codes left by earlier plugin versions. Pending verification codes, mismatched accounts and unreadable authentication state are not treated as a completed login. The UI status endpoint returns only a boolean, never tokens or session details, and makes no cloud requests.
 
-If Cognito invalidates the saved refresh token, the plugin falls back to the SMS verification flow again.
+If Cognito explicitly rejects the saved refresh token, the plugin falls back to the SMS verification flow again. Temporary Cognito service, rate-limit, timeout, and network errors do not delete the saved login.
 
-To completely unlink the account and start over, open the plugin settings and press **Reset My Tadiran plugin** in the **Factory reset** section. The reset clears the plugin's saved Tadiran authentication file and restores its configuration to defaults, including the phone number (`+972` placeholder) and an empty OTP. The Homebridge child-bridge identity is deliberately preserved, so resetting the Tadiran account does not require pairing the child bridge with Apple Home again. Restart Homebridge after the reset before linking the account again.
+If a saved-token refresh fails temporarily at startup, the plugin retries after 30 seconds, doubling the delay on repeated failures up to five minutes. Normal polling resumes after recovery. SMS sending and OTP verification are not automatically retried after network failures: check the logs and complete setup manually to avoid duplicate SMS requests.
+
+Each HTTP request has a 15-second timeout (including reading its response). A multi-step login or a command requiring token refresh can take longer overall. A timed-out command might already have reached the cloud; check the next reported state before issuing it again. Version 0.1.7 refreshes the settings screen without adding or changing HomeKit controls.
+
+The settings screen follows Homebridge's light/dark mode and uses its normal **Save** button. Opening existing settings contacts no Tadiran service; its only automatic configuration change is removal of a used OTP as described above. Ordinary edits are staged until you save and preserve child-bridge metadata and unrecognized options. The plugin name is not offered as an editable setting; existing names are preserved. Connection reset requires confirmation and takes effect immediately.
+
+**Reset connection** removes the plugin's saved authentication file (including tokens and pending SMS session), legacy reconnect state, and authentication fields in active configuration. It preserves all other settings and writes a reset marker to stop a running child bridge from restoring the deleted login. Restart Homebridge after resetting before linking again. The disconnected configuration is valid, and the plugin waits for a phone number before starting.
 
 ## Compatibility
 
