@@ -13,6 +13,8 @@ const schema = JSON.parse(fs.readFileSync(new URL('../config.schema.json', impor
 assert.equal(schema.customUi, true);
 assert.equal(schema.pluginType, 'platform');
 assert.equal(schema.pluginAlias, 'MyTadiran');
+assert.equal(schema.schema.properties.name.type, 'string', 'Homebridge verification requires a name schema property');
+assert.equal(schema.schema.properties.name.default, 'My Tadiran');
 assert.match(html, /src="settings\.js\?v=0\.1\.7-ui3"/);
 assert.match(html, /href="settings\.css\?v=0\.1\.7-ui3"/);
 assert.equal((html.match(/role="switch"/g) || []).length, 4);
@@ -45,7 +47,9 @@ async function frontend(options = {}) {
       addEventListener(event, fn) { this.events[event] = fn; },
     };
   }
-  for (const key of Object.keys(schema.schema.properties)) assert.ok(elements[key], `missing setting ${key}`);
+  // Homebridge requires name in the schema; the custom UI preserves it without
+  // exposing a platform-name editor.
+  for (const key of Object.keys(schema.schema.properties).filter(key => key !== 'name')) assert.ok(elements[key], `missing setting ${key}`);
   const calls = [];
   const events = {};
   let config = clone(options.config ?? initial);

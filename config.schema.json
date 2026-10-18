@@ -7,6 +7,12 @@
   "schema": {
     "type": "object",
     "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "My Tadiran",
+        "description": "Platform name used by Homebridge."
+      },
       "phone": {
         "title": "My Tadiran phone number",
         "type": "string",

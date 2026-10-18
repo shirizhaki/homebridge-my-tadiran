@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8 - 2026-10-18
+
+- Restore the platform `name` property in the configuration schema, as required by Homebridge verification. The custom settings screen continues to preserve existing names without exposing a name editor.
+- Add regression coverage for the required schema property and the custom UI field mapping.
+
 ## 0.1.7 — Reliability and refreshed settings
 
 - Replace the mixed custom/schema screen with one responsive settings UI: accessible toggle switches, light/dark styling, grouped account/HomeKit/preferences sections, and concise labels. Do not expose the plugin name as an editable field.
