@@ -1,6 +1,8 @@
 # Homebridge My Tadiran
 
-[![npm version](https://img.shields.io/npm/v/homebridge-my-tadiran.svg)](https://www.npmjs.com/package/homebridge-my-tadiran) [![npm downloads](https://img.shields.io/npm/dt/homebridge-my-tadiran.svg)](https://www.npmjs.com/package/homebridge-my-tadiran) [![CI](https://github.com/shirizhaki/homebridge-my-tadiran/actions/workflows/ci.yml/badge.svg)](https://github.com/shirizhaki/homebridge-my-tadiran/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<img src="https://raw.githubusercontent.com/shirizhaki/homebridge-my-tadiran/main/branding/icon.png" alt="My Tadiran icon" width="100" height="100">
+
+[![Verified by Homebridge](https://img.shields.io/badge/homebridge-verified-blueviolet?color=%23491F59&style=flat)](https://github.com/homebridge/homebridge/wiki/Verified-Plugins) [![npm version](https://img.shields.io/npm/v/homebridge-my-tadiran.svg)](https://www.npmjs.com/package/homebridge-my-tadiran) [![npm downloads](https://img.shields.io/npm/dt/homebridge-my-tadiran.svg)](https://www.npmjs.com/package/homebridge-my-tadiran) [![CI](https://github.com/shirizhaki/homebridge-my-tadiran/actions/workflows/ci.yml/badge.svg)](https://github.com/shirizhaki/homebridge-my-tadiran/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Unofficial Homebridge platform plugin for **Tadiran air conditioners paired with the My Tadiran mobile app**.
 
@@ -109,11 +111,11 @@ docker compose exec homebridge npm install --save github:shirizhaki/homebridge-m
 
 Then restart the Homebridge service.
 
-### Homebridge search and “Verified” status
+### Homebridge verification
 
-Publishing `homebridge-my-tadiran` to the public npm registry makes it discoverable from the Homebridge plugin search because the package name and metadata follow Homebridge plugin conventions and include the `homebridge-plugin` keyword.
+`homebridge-my-tadiran` is **Verified by Homebridge** and is included in the [official verified plugins list](https://github.com/homebridge/plugins/blob/latest/verified-plugins.json).
 
-The green **Verified by Homebridge** badge is a separate review program. It is **not required** for users to find or install the plugin. After the initial public release has been tested by more users, the project can be submitted to the Homebridge team for verification.
+Search for **My Tadiran** in **Homebridge UI → Plugins** to find and install it. The Homebridge UI manages its verified indicator using Homebridge's plugin metadata.
 
 ## Example configuration
 
